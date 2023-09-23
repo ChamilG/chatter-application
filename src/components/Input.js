@@ -3,7 +3,7 @@ import { useState } from "react"
 // import {BsCardImage} from 'react-icons/bs'
 
 export default function Input(props) {
-  const[current]
+  
   const[text, setText] = useState(null);
   
   const handleSend = () => {

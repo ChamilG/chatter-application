@@ -41,7 +41,7 @@ export default function SideChats() {
             <div className='userChatInfo'>
                 <img className='user-image' src={chat[1].userInfo.photoURL} 
                 alt=""/>
-                 <p className='p'><span className='span'>{chat[1].userInfo.displayName}</span><br/> hello</p>
+                 <p className='p'><span className='span'>{chat[1].userInfo.displayName}</span><br/> {chat[1].lastMessage.text}</p>
             </div>
             </div>
              )}

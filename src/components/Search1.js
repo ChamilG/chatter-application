@@ -22,43 +22,77 @@ export default function Search() {
   
   const handleKey = (e) => {
     e.code === "Enter" && handleSearch();
-  };
-  
+  }; 
   const handleClickOnUser = async() =>{
  // creating a new chat if doesnot exist
     const combinedID = currentUser.uid > user.uid
     ? currentUser.uid + user.uid
     : user.uid + currentUser.uid;
+
     try {
       const chatRef = await getDoc(doc(db, "chats", combinedID));
-      // const chatDocRef = await getDoc(doc(db, "userChats", currentUser.uid));
+      const currUserChatRef  = await getDoc(doc(db, "userChats", currentUser.uid));
+      const userChatRef  = await getDoc(doc(db, "userChats", user.uid));
+
       if(!chatRef.exists()){
         await setDoc(doc(db, "chats", combinedID), {messages:[]});
 
+        if (currUserChatRef.exists()){
+
           await updateDoc(doc(db, "userChats", currentUser.uid ),{
-            [combinedID + ".userInfo"]: {
-              uid: user.uid,
-              displayName: user.displayName,
-              photoURL: user.photoURL,
-            },
-            [combinedID + ".date"]: serverTimestamp(),
-          });
-          await updateDoc(doc(db, "userChats", user.uid ),{
-            [combinedID + ".userInfo"]: {
-              uid: currentUser.uid,
-              displayName: currentUser.displayName,
-              photoURL: currentUser.photoURL,
-            },
-            [combinedID + ".date"]: serverTimestamp(),
-          });
+            chats:arrayUnion({
+            uid: user.uid,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            combinedID: combinedID,
+          })});
         }
+        else{
+          const chat = {
+            uid: user.uid,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            combinedID: combinedID,
+            is_Chat: false,
+            sentAt: serverTimestamp()
+          }
+          const currentUserref = doc(db, "userChats", "user");
+          await setDoc(currentUserref,{});
+          const subcollectionRef = collection(currentUserref, currentUser.uid);
+          await setDoc(doc(subcollectionRef, user.id), chat);
+
+
+        }
+        if (userChatRef.exists()){
+        await updateDoc(doc(db, "userChats", user.uid ),{
+          chats:arrayUnion({
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+            combinedID: combinedID,
+            // sentAt: serverTimestamp(),
+        })})
+        }
+      else{
+        const chat = {
+          uid: currentUser.uid,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL,
+          combinedID: combinedID,
+          is_Chat: false,
+          sentAt: serverTimestamp()
+        }
+        const currentUserref = doc(db, "userChats", "user");
+        // await setDoc(currentUserref,{});
+        const subcollectionRef = collection(currentUserref, currentUser.uid);
+        await setDoc(doc(subcollectionRef, user.id), chat);
       }
-    catch (error) {
+      }
+    } catch (error) {
         console.log(error);
     }
     setUser(null);
   }
-
   return (
     <div className='search-container'>
         <div className='search-form'>

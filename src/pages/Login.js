@@ -12,7 +12,7 @@ export default function Login() {
     const { uid, displayName, photoURL } = auth.currentUser;
     const userRef = doc(db, "users", uid);
     const userDoc = await getDoc(userRef);
-
+   
     if(!userDoc.exists()){
 
       const data = {
@@ -21,6 +21,8 @@ export default function Login() {
         photoURL: photoURL,
       }
       await setDoc(userRef, data);
+      // create empty documents for each user in userChats collection
+      await setDoc(doc(db, "userChats", uid), {});
     }
   }
   const googleSignIn = async () =>{

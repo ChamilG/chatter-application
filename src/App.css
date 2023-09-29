@@ -81,11 +81,13 @@ html,body{
   }
 }
 .userChatInfo {
-  span {
+  display: flex;
+  gap: 10px;
+  .span {
     font-size: 18px;
     font-weight: 500;
   }
-  p {
+  .p {
     font-size: 14px;
     color: lightgray;
   }
